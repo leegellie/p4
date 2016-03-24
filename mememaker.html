@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MemeMaker-Simple</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <style>
+    #image-container {
+      display: flex;
+    }
+
+    #meme {
+        width: 200px;
+        height: 200px;
+        box-shadow: #000 2px 2px 2px;
+        margin-top: 40px;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" rel="stylesheet">
+    <script src="js/reimg.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="row">
+            <h1>Lee's MemeMaker</h1>
+        </header>
+        <section class="row">
+            <div id="image-container" class="col-sm-7">
+                <canvas id="Final" width="500" height="500"></canvas>
+            </div>
+            <div class="col-sm-5">
+                <input id="file" type="file"> <span>Top Line:</span><br>
+                <input id="topLineText" type="text"><br>
+                <span>Bottom Line:</span><br>
+                <input id="bottomLineText" type="text"><br>
+                <button type='button' onClick="displayFile()">Display</button>
+                <button onclick="saveFile()" type='button'>Save</button>
+                <div id="display"></div>
+            </div>
+        </section>
+    </div>
+    <script>
+function textChangeListener(evt) {
+    var id = evt.target.id;
+    var text = evt.target.value;
+
+    if (id === "topLineText") {
+        window.topLineText = text;
+    } else {
+        window.bottomLineText = text;
+    }
+
+    redrawMeme(window.imageSrc, window.topLineText, window.bottomLineText);
+};
+
+function redrawMeme(image, topLine, bottomLine) {
+    // Get Canvas2DContext
+    var canvas = document.querySelector('canvas');
+    var ctx = canvas.getContext("2d");
+    if (image !== null) {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    }
+    ctx.font = '36pt Impact';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 3;
+    ctx.fillStyle = 'white';
+
+    if (topLine !== null) {
+        ctx.fillText(topLine, canvas.width / 2, 50);
+        ctx.strokeText(topLine, canvas.width / 2, 50);
+    }
+
+    if (bottomLine !== null) {
+        ctx.fillText(bottomLine, canvas.width / 2, canvas.height - 20);
+        ctx.strokeText(bottomLine, canvas.width / 2, canvas.height - 20);
+    }
+
+};
+
+function saveFile() {
+    var svImg = document.createElement('a');
+    svImg.href = $('#meme').attr('src');
+    svImg.download = 'myMeme.png';
+    svImg.click();
+    //window.open(document.querySelector(canvas).toDataURL());
+};
+
+function displayFile() {
+	   //alert("Start of disp Fuct");
+    var png = ReImg.fromCanvas(document.getElementById('Final')).toPng();
+	   //alert("Start of disp Fuct if Statement");
+    if ($('#display').is(':empty') ) {
+        $('#display').append(png);
+								$('#display').append(png);
+								$('#display').append(png);
+    } else {
+	   //alert("Start of disp Fuct else Statement");
+        $('#display').empty();
+        $('#display').append(png);
+    }
+	   //alert("End of disp Fuct if Statement");
+};
+
+function handleFileSelect(evt) {
+    var canvasWidth = 500;
+    var canvasHeight = 500;
+    var file = evt.target.files[0];
+
+    var reader = new FileReader();
+    reader.onload = function(fileObject) {
+        var data = fileObject.target.result;
+
+        // Create an image object
+        var image = new Image();
+        image.onload = function() {
+
+            window.imageSrc = this;
+            redrawMeme(window.imageSrc, null, null);
+        };
+
+        // Set image data to background image.
+        image.src = data;
+        console.log(fileObject.target.result);
+    };
+    reader.readAsDataURL(file);
+};
+
+window.topLineText = "";
+window.bottomLineText = "";
+var input1 = document.getElementById('topLineText');
+var input2 = document.getElementById('bottomLineText');
+input1.oninput = textChangeListener;
+input2.oninput = textChangeListener;
+document.getElementById('file').addEventListener('change', handleFileSelect, false);
+document.querySelector('button').addEventListener('click', saveFile, false);
+    </script>
+</body>
+</html>
